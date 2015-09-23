@@ -10,14 +10,14 @@
 
 #include <osg/Geometry>
 
+typedef std::pair< float, float > Coordinate;
+
 
 class PolarGridGeometry : public osg::Geometry
 {
-public:
+public:    
     
-    typedef std::pair< float, float > Coordinate;
-    
-    PolarGridGeometry( int radialSize, int angularSize );
+    PolarGridGeometry( unsigned int radialSize, unsigned int angularSize );
     
     virtual ~PolarGridGeometry();
     
@@ -25,11 +25,13 @@ private:
     
     void buildGeometry();
     
-    Coordinate polarToCartesian( const Coordinate& polar );
+    static Coordinate polarToCartesian( const Coordinate& polar );
     
     
-    int _radialSize, _angularSize;
-
+    unsigned int _radialSize, _angularSize;
+    
+    osg::ref_ptr< osg::Vec3Array > _vertices;
+    osg::ref_ptr< osg::Vec3Array > _normals;
 };
 
 #endif	/* POLARGRIDGEOMETRY_H */

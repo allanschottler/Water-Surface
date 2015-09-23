@@ -20,7 +20,9 @@ class WaterSurfaceNode : public osg::Node
 {
 public:
     
-    WaterSurfaceNode( unsigned int heightMapLevels );
+    WaterSurfaceNode( unsigned int heightMapLevels, 
+                      unsigned int polarGridRadialSize, 
+                      unsigned int polarGridAngularSize );
     
     virtual ~WaterSurfaceNode();
     
@@ -32,9 +34,7 @@ private:
     unsigned int _heightMapLevels;
     
     osg::ref_ptr< osg::Geode > _geode;
-    
-    std::vector< osg::ref_ptr< osg::Texture3D > > _vertexTextures3D;
-    
+        
     WaterSurfaceShader _shader;
 
 };

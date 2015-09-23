@@ -9,10 +9,21 @@
 
 #include "WaterSurfaceNode.h"
 #include "NoiseTexture3D.h"
+#include "PolarGridGeometry.h"
 
-WaterSurfaceNode::WaterSurfaceNode( unsigned int heightMapLevels ) 
+
+WaterSurfaceNode::WaterSurfaceNode( unsigned int heightMapLevels, 
+                                    unsigned int polarGridRadialSize, 
+                                    unsigned int polarGridAngularSize ) 
 {
     _heightMapLevels = heightMapLevels;
+    
+    _geode = new osg::Geode();    
+    _geode->addDrawable( osg::ref_ptr< PolarGridGeometry >( new PolarGridGeometry( polarGridRadialSize, polarGridAngularSize ) ) );
+        
+    buildVertexTextures();
+    
+    _shader.linkStateSet( _geode->getOrCreateStateSet() );
 }
 
 
@@ -25,6 +36,6 @@ void WaterSurfaceNode::buildVertexTextures()
 {
     for( unsigned int iLevel = 0; iLevel < _heightMapLevels; iLevel++ )
     {
-        _vertexTextures3D.push_back( new NoiseTexture3D( powerof2( iLevel ) ) );
+        _geode->getOrCreateStateSet()->setTextureAttributeAndModes( iLevel, new NoiseTexture3D( powerof2( iLevel ) ), osg::StateAttribute::ON );
     }
 }
