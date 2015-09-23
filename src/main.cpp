@@ -5,13 +5,15 @@
  * Created on September 23, 2015, 1:57 PM
  */
 
-#include <iostream>
+#include "WaterSurfaceApplication.h"
 /*
  * 
  */
 int main(int argc, char** argv) 
 {
-    std::cout << "Hello World!\n";
+    WaterSurfaceApplication app;
+    app.run();
+    
     return 0;
 }
 
