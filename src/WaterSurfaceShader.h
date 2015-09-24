@@ -12,33 +12,42 @@
 #include <osg/Texture3D>
 #include <osg/Program>
 #include <osg/Uniform>
+#include <osg/NodeVisitor>
 
 
-class WaterSurfaceShader 
+class WaterSurfaceShader : public osg::Uniform::Callback
 {
 public:
     
     WaterSurfaceShader();
         
-    virtual ~WaterSurfaceShader();
+    virtual ~WaterSurfaceShader();    
+
+    virtual void operator()( osg::Uniform* u, osg::NodeVisitor* nv )
+    {
+        float t = (float)nv->getFrameStamp()->getReferenceTime();
+        u->set( t );
+    }
+
     
     void linkStateSet( osg::ref_ptr<osg::StateSet> stateSet );        
 
     void loadVariables();
     
-    void setVertexTextures( std::vector< osg::ref_ptr< osg::Texture3D > > vertexTextures3D );
-    
 private:    
     
-    static const char* _vertexProgram;
+    static std::string readFile( const char *filePath );
+    
+    
+    std::string _vertexProgram;
 
-    static const char* _fragmentProgram;
+    std::string _fragmentProgram;
         
     osg::ref_ptr< osg::Program > _shaderProgram;
 
-    osg::ref_ptr< osg::Uniform > _vertexTexturesUniform;
+    osg::ref_ptr< osg::Uniform > _timeUniform;
     
-    std::vector< osg::ref_ptr< osg::Texture3D > > _vertexTextures3D;
+    std::vector< osg::ref_ptr< osg::Uniform > > _vertexTexturesUniforms;
 };
 
 #endif	/* WATERSURFACESHADER_H */

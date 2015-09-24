@@ -17,6 +17,13 @@ NoiseTexture3D::NoiseTexture3D( unsigned int pixelSize )
     _image->allocateImage( pixelSize, pixelSize, pixelSize, GL_RGB, GL_FLOAT );
     
     buildTexture();
+    
+    setFilter( osg::Texture3D::MIN_FILTER, osg::Texture3D::LINEAR );
+    setFilter( osg::Texture3D::MAG_FILTER, osg::Texture3D::LINEAR );
+    
+    setWrap( osg::Texture3D::WRAP_R, osg::Texture3D::MIRROR );
+    setWrap( osg::Texture3D::WRAP_T, osg::Texture3D::MIRROR );
+    setWrap( osg::Texture3D::WRAP_S, osg::Texture3D::MIRROR );
 }
 
 

@@ -15,8 +15,9 @@ PolarGridGeometry::PolarGridGeometry( unsigned int radialSize, unsigned int angu
     _radialSize  = radialSize;
     _angularSize = angularSize;
     
-    _vertices = new osg::Vec3Array;
-    _normals = new osg::Vec3Array;
+    _vertices  = new osg::Vec3Array;
+    _normals   = new osg::Vec3Array;
+    _texcoords = new osg::Vec2Array;
     
     setUseVertexBufferObjects( true );
     
@@ -43,7 +44,7 @@ Coordinate PolarGridGeometry::makePolarCoordinate( const ICoordinate& ipolar )
 
 unsigned int PolarGridGeometry::getIndex( const ICoordinate& ipolar )
 {
-    unsigned int iRadius = ipolar.first >= _radialSize ? ipolar.first - _radialSize : ipolar.first;
+    unsigned int iRadius = ipolar.first  >= _radialSize  ? ipolar.first - _radialSize   : ipolar.first;
     unsigned int iAngle  = ipolar.second >= _angularSize ? ipolar.second - _angularSize : ipolar.second;
     
     return iAngle + iRadius * _angularSize;
@@ -56,27 +57,17 @@ Coordinate PolarGridGeometry::polarToCartesian( const Coordinate& polar )
 }
 
 
+Coordinate PolarGridGeometry::polarToTexCoord( const Coordinate& polar )
+{
+    Coordinate c = polarToCartesian( polar );
+    
+    return std::make_pair( (float)( ( polar.first  + _radialSize ) / ( 2 * _radialSize ) ), 
+                           (float)( ( polar.second + _radialSize ) / ( 2 * _radialSize ) ) );
+}
+
+
 void PolarGridGeometry::buildGeometry()
 {    
-    ICoordinate i1 = makePolarIndex( _radialSize, _angularSize );
-    unsigned int index = getIndex( i1 );
-    
-    for( unsigned int iRadius = 0; iRadius < _radialSize; iRadius++ )
-    {
-        for( unsigned int iAngle = 0; iAngle < _angularSize; iAngle++ )
-        {
-            ICoordinate i1 = makePolarIndex( iRadius, iAngle );   
-            Coordinate p   = makePolarCoordinate( i1 );
-            Coordinate c   = polarToCartesian( p );             
-            
-            
-            // Vertex array
-            _vertices->push_back( osg::Vec3( c.first, c.second, 0.0f ) );
-        }
-    }
-    
-    setVertexArray( _vertices );
-    
     for( unsigned int iRadius = 0; iRadius < _radialSize; iRadius++ )
     {
         for( unsigned int iAngle = 0; iAngle < _angularSize; iAngle++ )
@@ -84,7 +75,17 @@ void PolarGridGeometry::buildGeometry()
             ICoordinate i1 = makePolarIndex( iRadius, iAngle );
             ICoordinate i2 = makePolarIndex( iRadius, iAngle + 1 );
             ICoordinate i3 = makePolarIndex( iRadius + 1, iAngle );
-            ICoordinate i4 = makePolarIndex( iRadius + 1, iAngle + 1 );  
+            ICoordinate i4 = makePolarIndex( iRadius + 1, iAngle + 1 ); 
+            
+            Coordinate p   = makePolarCoordinate( i1 );
+            Coordinate c   = polarToCartesian( p );
+            Coordinate t   = polarToTexCoord( p );
+            
+            // Vertex array
+            _vertices->push_back( osg::Vec3( c.first, c.second, 0.0f ) );
+            
+            // TexCoord array
+            //_texcoords->push_back( osg::Vec2( t.first, t.second ) );
             
             // Index array
             osg::ref_ptr< osg::DrawElementsUInt > triangle1 = new osg::DrawElementsUInt( osg::PrimitiveSet::LINE_LOOP, 0 );
@@ -101,7 +102,10 @@ void PolarGridGeometry::buildGeometry()
             
             addPrimitiveSet( triangle2 ); 
         }
-    }   
+    }
+    
+    setVertexArray( _vertices );    
+    setTexCoordArray( 0, _texcoords );
     
     // Color array
     osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;

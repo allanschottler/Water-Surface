@@ -27,11 +27,13 @@ private:
     
     ICoordinate makePolarIndex( unsigned int iRadius, unsigned int iAngle );
     
-    Coordinate makePolarCoordinate( const ICoordinate& ipolar );
+    Coordinate makePolarCoordinate( const ICoordinate& ipolar );        
     
     unsigned int getIndex( const ICoordinate& ipolar );
         
-    static Coordinate polarToCartesian( const Coordinate& polar );
+    static Coordinate polarToCartesian( const Coordinate& polar );  
+    
+    Coordinate polarToTexCoord( const Coordinate& polar );
     
     void buildGeometry();
     
@@ -40,6 +42,7 @@ private:
     
     osg::ref_ptr< osg::Vec3Array > _vertices;
     osg::ref_ptr< osg::Vec3Array > _normals;
+    osg::ref_ptr< osg::Vec2Array > _texcoords;
 };
 
 #endif	/* POLARGRIDGEOMETRY_H */

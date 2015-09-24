@@ -6,6 +6,7 @@
  */
 
 #include <sys/param.h>
+#include <math.h>
 
 #include "WaterSurfaceNode.h"
 #include "NoiseTexture3D.h"
@@ -25,9 +26,9 @@ WaterSurfaceNode::WaterSurfaceNode( unsigned int heightMapLevels,
         
     addChild( _geode );
     
-    //buildVertexTextures();
+    buildVertexTextures();
     
-    //_shader.linkStateSet( _geode->getOrCreateStateSet() );
+    _shader.linkStateSet( _geode->getOrCreateStateSet() );
 }
 
 
@@ -40,6 +41,7 @@ void WaterSurfaceNode::buildVertexTextures()
 {
     for( unsigned int iLevel = 0; iLevel < _heightMapLevels; iLevel++ )
     {
-        _geode->getOrCreateStateSet()->setTextureAttributeAndModes( iLevel, new NoiseTexture3D( powerof2( iLevel ) ), osg::StateAttribute::ON );
+        int power = (int)pow( 2.0, (double)iLevel );
+        _geode->getOrCreateStateSet()->setTextureAttributeAndModes( iLevel, new NoiseTexture3D( power ), osg::StateAttribute::ON );
     }
 }
