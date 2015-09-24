@@ -18,12 +18,16 @@ WaterSurfaceNode::WaterSurfaceNode( unsigned int heightMapLevels,
 {
     _heightMapLevels = heightMapLevels;
     
-    _geode = new osg::Geode();    
-    _geode->addDrawable( osg::ref_ptr< PolarGridGeometry >( new PolarGridGeometry( polarGridRadialSize, polarGridAngularSize ) ) );
-        
-    buildVertexTextures();
+    osg::ref_ptr< PolarGridGeometry > polarGridGeometry = new PolarGridGeometry( polarGridRadialSize, polarGridAngularSize );
     
-    _shader.linkStateSet( _geode->getOrCreateStateSet() );
+    _geode = new osg::Geode();    
+    _geode->addDrawable( polarGridGeometry );
+        
+    addChild( _geode );
+    
+    //buildVertexTextures();
+    
+    //_shader.linkStateSet( _geode->getOrCreateStateSet() );
 }
 
 

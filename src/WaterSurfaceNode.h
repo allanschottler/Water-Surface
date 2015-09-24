@@ -16,7 +16,7 @@
 #include "WaterSurfaceShader.h"
 
 
-class WaterSurfaceNode : public osg::Node
+class WaterSurfaceNode : public osg::Group
 {
 public:
     

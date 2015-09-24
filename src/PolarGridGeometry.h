@@ -10,8 +10,10 @@
 
 #include <osg/Geometry>
 
+
 typedef std::pair< float, float > Coordinate;
 
+typedef std::pair< unsigned int, unsigned int > ICoordinate;
 
 class PolarGridGeometry : public osg::Geometry
 {
@@ -23,9 +25,15 @@ public:
     
 private:
     
-    void buildGeometry();
+    ICoordinate makePolarIndex( unsigned int iRadius, unsigned int iAngle );
     
+    Coordinate makePolarCoordinate( const ICoordinate& ipolar );
+    
+    unsigned int getIndex( const ICoordinate& ipolar );
+        
     static Coordinate polarToCartesian( const Coordinate& polar );
+    
+    void buildGeometry();
     
     
     unsigned int _radialSize, _angularSize;
