@@ -13,29 +13,19 @@
 #include <osg/Texture3D>
 #include <vector>
 
-#include "WaterSurfaceShader.h"
-
 
 class WaterSurfaceNode : public osg::Group
 {
 public:
     
-    WaterSurfaceNode( unsigned int heightMapLevels, 
-                      unsigned int polarGridRadialSize, 
+    WaterSurfaceNode( unsigned int polarGridRadialSize, 
                       unsigned int polarGridAngularSize );
     
     virtual ~WaterSurfaceNode();
-    
+        
 private:
-        
-    void buildVertexTextures();
-    
-    
-    unsigned int _heightMapLevels;
-    
-    osg::ref_ptr< osg::Geode > _geode;
-        
-    WaterSurfaceShader _shader;
+               
+    osg::ref_ptr< osg::Geode > _geode;        
 
 };
 

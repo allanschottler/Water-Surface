@@ -14,16 +14,19 @@ NoiseTexture3D::NoiseTexture3D( unsigned int pixelSize )
 {
     _pixelSize = pixelSize;
     _image = new osg::Image();
-    _image->allocateImage( pixelSize, pixelSize, pixelSize, GL_RGB, GL_FLOAT );
-    
+    _image->allocateImage( pixelSize, pixelSize, pixelSize, GL_LUMINANCE, GL_FLOAT );
+        
     buildTexture();
     
     setFilter( osg::Texture3D::MIN_FILTER, osg::Texture3D::LINEAR );
     setFilter( osg::Texture3D::MAG_FILTER, osg::Texture3D::LINEAR );
     
-    setWrap( osg::Texture3D::WRAP_R, osg::Texture3D::MIRROR );
-    setWrap( osg::Texture3D::WRAP_T, osg::Texture3D::MIRROR );
     setWrap( osg::Texture3D::WRAP_S, osg::Texture3D::MIRROR );
+    setWrap( osg::Texture3D::WRAP_T, osg::Texture3D::MIRROR );
+    setWrap( osg::Texture3D::WRAP_R, osg::Texture3D::MIRROR );    
+    
+    setDataVariance( osg::Object::DYNAMIC );
+    setInternalFormat( GL_LUMINANCE32F_ARB );
 }
 
 
@@ -49,9 +52,9 @@ void NoiseTexture3D::buildTexture()
             for( unsigned int k = 0; k < _pixelSize; k++ )
             {
                 float val = randomFloat();
-                _image->data( k, j, i )[ 0 ] = val;
-                _image->data( k, j, i )[ 1 ] = val;
-                _image->data( k, j, i )[ 2 ] = val;
+                _image->data( k, j, i )[ 0 ] = 1.0f;
+                _image->data( k, j, i )[ 1 ] = 0.0f;
+                _image->data( k, j, i )[ 2 ] = 0.0f;
             }
         }
     }

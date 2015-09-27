@@ -16,7 +16,6 @@
 
 const int WindowWidth       = 800;
 const int WindowHeight      = 800;
-const int NumHeightMaps     = 8;
 const int GridRadialSize    = 100;
 const int GridAngularSize   = 100;
 
@@ -38,17 +37,17 @@ int WaterSurfaceApplication::run()
     
     osg::ref_ptr< osgGA::TrackballManipulator > manipulator = new osgGA::TrackballManipulator();
     viewer.setCameraManipulator( manipulator );
-    
+        
     osg::ref_ptr< osg::Group > root = new osg::Group;
     
     osg::ref_ptr< osg::PositionAttitudeTransform > terrainTransform = new osg::PositionAttitudeTransform();  
     
-    osg::ref_ptr< WaterSurfaceNode > waterSurfaceNode = new WaterSurfaceNode( NumHeightMaps, GridRadialSize, GridAngularSize );
+    osg::ref_ptr< WaterSurfaceNode > waterSurfaceNode = new WaterSurfaceNode( GridRadialSize, GridAngularSize );
     
-    osgUtil::SmoothingVisitor smoothingVisitor;
+    //osgUtil::SmoothingVisitor smoothingVisitor;
     
     // Link
-    waterSurfaceNode->accept( smoothingVisitor );    
+    //waterSurfaceNode->accept( smoothingVisitor );    
     terrainTransform->addChild( waterSurfaceNode );
     root->addChild( terrainTransform );    
     viewer.setSceneData( root.get() ); 

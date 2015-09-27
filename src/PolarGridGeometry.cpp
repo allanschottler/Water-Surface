@@ -6,8 +6,10 @@
  */
 
 #include <math.h>
+#include <iostream>
 
 #include "PolarGridGeometry.h"
+#include "WaterSurfaceShader.h"
 
 
 PolarGridGeometry::PolarGridGeometry( unsigned int radialSize, unsigned int angularSize ) 
@@ -17,16 +19,23 @@ PolarGridGeometry::PolarGridGeometry( unsigned int radialSize, unsigned int angu
     
     _vertices  = new osg::Vec3Array;
     _normals   = new osg::Vec3Array;
-    _texcoords = new osg::Vec2Array;
+    _texcoords = new osg::Vec3Array;
     
     setUseVertexBufferObjects( true );
+    setUseDisplayList( false );
     
-    buildGeometry();
+    buildGeometry(); 
 }
 
 
 PolarGridGeometry::~PolarGridGeometry() 
 {
+}
+
+
+void PolarGridGeometry::linkShader()
+{
+    _shader.linkStateSet( getOrCreateStateSet() );
 }
 
 
@@ -38,7 +47,8 @@ ICoordinate PolarGridGeometry::makePolarIndex( unsigned int iRadius, unsigned in
 
 Coordinate PolarGridGeometry::makePolarCoordinate( const ICoordinate& ipolar )
 {
-    return std::make_pair( (float)ipolar.first, (float)( ( 360.f/_angularSize ) * ipolar.second ) );
+    return std::make_pair( (float)ipolar.first, 
+                           (float)( ( 360.f/_angularSize ) * ipolar.second ) );
 }
 
 
@@ -53,16 +63,15 @@ unsigned int PolarGridGeometry::getIndex( const ICoordinate& ipolar )
 
 Coordinate PolarGridGeometry::polarToCartesian( const Coordinate& polar )
 {
-    return std::make_pair( polar.first * cos( polar.second * M_PI/180.f ), polar.first * sin( polar.second * M_PI/180.f ) );
+    return std::make_pair( polar.first * cos( polar.second * M_PI/180.f ), 
+                           polar.first * sin( polar.second * M_PI/180.f ) );
 }
 
 
-Coordinate PolarGridGeometry::polarToTexCoord( const Coordinate& polar )
-{
-    Coordinate c = polarToCartesian( polar );
-    
-    return std::make_pair( (float)( ( polar.first  + _radialSize ) / ( 2 * _radialSize ) ), 
-                           (float)( ( polar.second + _radialSize ) / ( 2 * _radialSize ) ) );
+Coordinate PolarGridGeometry::cartesianToTexCoord( const Coordinate& cartesian )
+{    
+    return std::make_pair( (float)( ( cartesian.first  + _radialSize ) / ( 2 * _radialSize ) ), 
+                           (float)( ( cartesian.second + _radialSize ) / ( 2 * _radialSize ) ) );
 }
 
 
@@ -79,23 +88,23 @@ void PolarGridGeometry::buildGeometry()
             
             Coordinate p   = makePolarCoordinate( i1 );
             Coordinate c   = polarToCartesian( p );
-            Coordinate t   = polarToTexCoord( p );
+            Coordinate t   = cartesianToTexCoord( c );
             
             // Vertex array
             _vertices->push_back( osg::Vec3( c.first, c.second, 0.0f ) );
             
             // TexCoord array
-            //_texcoords->push_back( osg::Vec2( t.first, t.second ) );
+            _texcoords->push_back( osg::Vec3( t.first, t.second, 0.0f ) );
             
             // Index array
-            osg::ref_ptr< osg::DrawElementsUInt > triangle1 = new osg::DrawElementsUInt( osg::PrimitiveSet::LINE_LOOP, 0 );
+            osg::ref_ptr< osg::DrawElementsUInt > triangle1 = new osg::DrawElementsUInt( osg::PrimitiveSet::TRIANGLES, 0 );
             triangle1->push_back( getIndex( i1 ) );
             triangle1->push_back( getIndex( i3 ) );
             triangle1->push_back( getIndex( i4 ) );
             
             addPrimitiveSet( triangle1 );
             
-            osg::ref_ptr< osg::DrawElementsUInt > triangle2 = new osg::DrawElementsUInt( osg::PrimitiveSet::LINE_LOOP, 0 );
+            osg::ref_ptr< osg::DrawElementsUInt > triangle2 = new osg::DrawElementsUInt( osg::PrimitiveSet::TRIANGLES, 0 );
             triangle2->push_back( getIndex( i1 ) );
             triangle2->push_back( getIndex( i4 ) );
             triangle2->push_back( getIndex( i2 ) );
@@ -106,11 +115,4 @@ void PolarGridGeometry::buildGeometry()
     
     setVertexArray( _vertices );    
     setTexCoordArray( 0, _texcoords );
-    
-    // Color array
-    osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
-    colors->push_back( osg::Vec4( 1.0f, 0.0f, 0.0f, 1.0f ) );
-    
-    setColorArray( colors );
-    setColorBinding( osg::Geometry::BIND_OVERALL );
 }

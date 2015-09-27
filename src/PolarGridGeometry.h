@@ -10,6 +10,8 @@
 
 #include <osg/Geometry>
 
+#include "WaterSurfaceShader.h"
+
 
 typedef std::pair< float, float > Coordinate;
 
@@ -21,7 +23,15 @@ public:
     
     PolarGridGeometry( unsigned int radialSize, unsigned int angularSize );
     
-    virtual ~PolarGridGeometry();
+    virtual ~PolarGridGeometry();    
+
+    void linkShader();
+
+    /*virtual void drawImplementation( osg::RenderInfo& renderInfo );
+    
+    virtual osg::BoundingBox computeBound() const;*/
+
+
     
 private:
     
@@ -33,7 +43,7 @@ private:
         
     static Coordinate polarToCartesian( const Coordinate& polar );  
     
-    Coordinate polarToTexCoord( const Coordinate& polar );
+    Coordinate cartesianToTexCoord( const Coordinate& cartesian );
     
     void buildGeometry();
     
@@ -42,7 +52,9 @@ private:
     
     osg::ref_ptr< osg::Vec3Array > _vertices;
     osg::ref_ptr< osg::Vec3Array > _normals;
-    osg::ref_ptr< osg::Vec2Array > _texcoords;
+    osg::ref_ptr< osg::Vec3Array > _texcoords;    
+    
+    WaterSurfaceShader _shader;
 };
 
 #endif	/* POLARGRIDGEOMETRY_H */
