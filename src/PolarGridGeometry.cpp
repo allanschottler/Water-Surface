@@ -20,9 +20,9 @@ PolarGridGeometry::PolarGridGeometry( unsigned int radialSize, unsigned int angu
     _vertices  = new osg::Vec3Array;
     _normals   = new osg::Vec3Array;
     _texcoords = new osg::Vec3Array;
-    
-    setUseVertexBufferObjects( true );
+        
     setUseDisplayList( false );
+    setUseVertexBufferObjects( true );
     
     buildGeometry(); 
 }

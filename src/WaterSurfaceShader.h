@@ -42,9 +42,10 @@ private:
 
     osg::ref_ptr< osg::Uniform > _timeUniform;
     
-    std::vector< unsigned int > _textureIDs;
+    osg::ref_ptr< osg::Texture3D > _noiseTexture;
     
-    unsigned int _uniqueTextureID;
+    std::vector< osg::ref_ptr< osg::Texture3D > > _vertexTextures;
+     
 };
 
 #endif	/* WATERSURFACESHADER_H */

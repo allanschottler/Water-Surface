@@ -11,13 +11,14 @@
 
 
 WaterSurfaceNode::WaterSurfaceNode( unsigned int polarGridRadialSize, 
-                                    unsigned int polarGridAngularSize ) 
+                                    unsigned int polarGridAngularSize )
 {    
     osg::ref_ptr< PolarGridGeometry > polarGridGeometry = new PolarGridGeometry( polarGridRadialSize, polarGridAngularSize );
     polarGridGeometry->linkShader();
     
     _geode = new osg::Geode();    
     _geode->addDrawable( polarGridGeometry );
+    _geode->getOrCreateStateSet()->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
         
     addChild( _geode );
 }

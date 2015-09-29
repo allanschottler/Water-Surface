@@ -21,6 +21,8 @@ public:
     WaterSurfaceNode( unsigned int polarGridRadialSize, 
                       unsigned int polarGridAngularSize );
     
+protected:
+        
     virtual ~WaterSurfaceNode();
         
 private:

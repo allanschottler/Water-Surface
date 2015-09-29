@@ -6,10 +6,12 @@
  */
 
 #include "OSGShaderFactory.h"
-#include "NoiseTexture3D.h"
 #include "TimeUniformCallback.h"
 
 #include "WaterSurfaceShader.h"
+
+#include <osgDB/ReadFile>
+#include <osg/Image>
 
 #include <sys/param.h>
 #include <math.h>
@@ -25,23 +27,20 @@ const std::string VertexTextureLocation = "vertexTexture";
 const std::string TimeLocation = "time";
 
 WaterSurfaceShader::WaterSurfaceShader() 
-{        
-    _uniqueTextureID = 0;
-    
-    _timeUniform = new osg::Uniform( osg::Uniform::FLOAT, TimeLocation.c_str() );
-    _timeUniform->set( 0.0f );    
-    
+{ 
     _vertexProgram   = readFile( "shader/vertexdisplacement.vs" );
     _fragmentProgram = readFile( "shader/vertexdisplacement.fs" );
     
     _shaderProgram = OSGShaderFactory::getInstance()->createShaderProgram( _vertexProgram, _fragmentProgram );
+    
+    // Vertex textures
+    _noiseTexture = buildNoiseTexture( 4 );    
+    //_vertexTextures.push_back( noiseTexture );
 }
 
 
 WaterSurfaceShader::~WaterSurfaceShader() 
 {
-    for( unsigned int i = 0; i < _textureIDs.size(); i++ )
-        glDeleteTextures( 1, &_textureIDs[ i ] );
 }
 
 
@@ -70,27 +69,62 @@ std::string WaterSurfaceShader::readFile( const char *filePath )
 
 osg::ref_ptr< osg::Texture3D > WaterSurfaceShader::buildNoiseTexture( unsigned int pixelSize )
 {
-    osg::ref_ptr< osg::Image > image = new osg::Image();    
+    /*osg::ref_ptr< osg::Image > image = new osg::Image();    
     image->allocateImage( pixelSize, pixelSize, pixelSize, GL_RGBA, GL_FLOAT );
+    image->setOrigin(osg::Image::BOTTOM_LEFT); */
         
+    /*const long size = pixelSize * pixelSize * pixelSize * 3;
+
+    unsigned char* data = (unsigned char*)calloc( size, sizeof( unsigned char ) ); 
+   
     srand( static_cast< unsigned >( time( 0 ) ) );
     
-    for( unsigned int i = 0; i < pixelSize; i++ )
+    for( long i = 0; i < size; i+=3 )
+    {
+        float val = static_cast< float >( rand() ) / static_cast< float >( RAND_MAX );
+        data[ i+0 ] = val*255;
+        data[ i+1 ] = val*255;
+        data[ i+2 ] = val*255;
+    }
+    
+    osg::ref_ptr< osg::Image > image = new osg::Image();    
+    image->setImage( 
+        (int)pixelSize, 
+        (int)pixelSize, 
+        (int)pixelSize, 
+        GL_RGB, 
+        GL_RGB, 
+        GL_UNSIGNED_BYTE, 
+        data, 
+        osg::Image::NO_DELETE 
+    );
+    
+    image->setOrigin( osg::Image::BOTTOM_LEFT );*/
+    
+    /*for( unsigned int i = 0; i < pixelSize; i++ )
     {
         for( unsigned int j = 0; j < pixelSize; j++ )
         {
             for( unsigned int k = 0; k < pixelSize; k++ )
             {
                 float val = static_cast< float >( rand() ) / static_cast< float >( RAND_MAX );
-                image->data( k, j, i )[ 0 ] = 1.0f;
-                image->data( k, j, i )[ 1 ] = 0.0f;
-                image->data( k, j, i )[ 2 ] = 0.0f;
-                image->data( k, j, i )[ 3 ] = 1.0f;
+                image->data( k, j, i )[ 0 ] = val;
+                image->data( k, j, i )[ 1 ] = val;
+                image->data( k, j, i )[ 2 ] = val;
             }
         }
-    }
+    }*/
         
-    osg::ref_ptr< osg::Texture3D > texture = new osg::Texture3D( image );
+    osg::ref_ptr< osg::Image > image = osgDB::readImageFile( "/home/v/allanws/Desktop/bunny100.png" );
+    image->scaleImage( pixelSize, pixelSize, 1 );
+    
+    osg::ref_ptr< osg::Image > image3d = new osg::Image;
+    image3d->allocateImage( pixelSize, pixelSize, 2, image->getPixelFormat(), image->getDataType() );
+    image3d->copySubImage( 0, 0, 0, image );
+    image3d->copySubImage( 0, 0, 1, image );
+    image3d->setInternalTextureFormat( image->getInternalTextureFormat() );
+    
+    osg::ref_ptr< osg::Texture3D > texture = new osg::Texture3D;
     
     texture->setFilter( osg::Texture3D::MIN_FILTER, osg::Texture3D::LINEAR );
     texture->setFilter( osg::Texture3D::MAG_FILTER, osg::Texture3D::LINEAR );
@@ -99,7 +133,8 @@ osg::ref_ptr< osg::Texture3D > WaterSurfaceShader::buildNoiseTexture( unsigned i
     texture->setWrap( osg::Texture3D::WRAP_T, osg::Texture3D::MIRROR );
     texture->setWrap( osg::Texture3D::WRAP_R, osg::Texture3D::MIRROR );    
     
-    texture->setDataVariance( osg::Object::DYNAMIC );
+    //texture->setDataVariance( osg::Object::DYNAMIC );
+    texture->setImage( image3d );
     
     return texture;
 }
@@ -107,10 +142,9 @@ osg::ref_ptr< osg::Texture3D > WaterSurfaceShader::buildNoiseTexture( unsigned i
 
 void WaterSurfaceShader::linkStateSet( osg::ref_ptr< osg::StateSet > stateSet )
 {           
-    std::stringstream ss;
-    osg::ref_ptr< osg::Uniform > uniform;
+    /*std::stringstream ss;
              
-    /*for( unsigned int iLevel = 0; iLevel < NumHeightMapLevels; iLevel++ )
+    for( unsigned int iLevel = 0; iLevel < NumHeightMapLevels; iLevel++ )
     {
         int level = (int)iLevel;
         
@@ -127,26 +161,24 @@ void WaterSurfaceShader::linkStateSet( osg::ref_ptr< osg::StateSet > stateSet )
         uniform->set( level );
         stateSet->addUniform( uniform );        
     }*/
-    
-    osg::ref_ptr< osg::Texture3D > noiseTexture = buildNoiseTexture( 4 );        
-    stateSet->setTextureAttributeAndModes( 0, noiseTexture, osg::StateAttribute::ON );
-
-    uniform = new osg::Uniform( "vertexTexture0", 0 );
-    stateSet->addUniform( uniform );   
-    
+            
+    // Time
+    _timeUniform = new osg::Uniform( osg::Uniform::FLOAT, TimeLocation.c_str() );
+    _timeUniform->set( 0.0f );
     _timeUniform->setUpdateCallback( new TimeUniformCallback() );
     stateSet->addUniform( _timeUniform );
-    
-    //stateSet->setAttributeAndModes( _shaderProgram, osg::StateAttribute::ON );
+        
+    stateSet->setTextureAttributeAndModes( 0, _noiseTexture, osg::StateAttribute::ON );
+        
+    osg::ref_ptr< osg::Uniform > uniform = new osg::Uniform( "vertexTexture0", 0 );
+    stateSet->addUniform( uniform ); 
+        
+    // Link
+    stateSet->setAttributeAndModes( _shaderProgram, osg::StateAttribute::ON );    
 }
 
 
 void WaterSurfaceShader::loadVariables()
 {
-    for( unsigned int i = 0; i < _textureIDs.size(); i++ )
-    {
-        glActiveTextureARB( GL_TEXTURE0 + i );    
-        glBindTexture( GL_TEXTURE_3D, _textureIDs[ i ] );
-    }
 }
 

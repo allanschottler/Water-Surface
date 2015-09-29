@@ -1,17 +1,11 @@
 
-uniform sampler3D vertexTexture0;
-uniform sampler3D vertexTexture1;
-uniform sampler3D vertexTexture2;
-uniform sampler3D vertexTexture3;
-uniform sampler3D vertexTexture4;
-uniform sampler3D vertexTexture5;
-uniform sampler3D vertexTexture6;
-uniform sampler3D vertexTexture7;
+uniform sampler2D vertexTexture0;
 
 varying vec4 outcolor;
 
 void main( void )
 {
-    gl_FragColor = texture3D( vertexTexture1, gl_TexCoord[0].xyz ); 
-    //gl_FragColor = vec4( gl_TexCoord[0].xyz, 1.0);
+    gl_FragColor = texture2D( vertexTexture0, gl_TexCoord[0].xy ); 
+    //gl_FragColor = vec4( gl_TexCoord[0].xyz, 1.0 );
+    //gl_FragColor = vec4( 1.0,0.0,0.0, 1.0 );
 }

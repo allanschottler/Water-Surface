@@ -23,15 +23,15 @@ public:
     
     PolarGridGeometry( unsigned int radialSize, unsigned int angularSize );
     
-    virtual ~PolarGridGeometry();    
-
     void linkShader();
 
     /*virtual void drawImplementation( osg::RenderInfo& renderInfo );
     
     virtual osg::BoundingBox computeBound() const;*/
 
-
+protected:
+        
+    virtual ~PolarGridGeometry();  
     
 private:
     

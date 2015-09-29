@@ -35,22 +35,22 @@ int WaterSurfaceApplication::run()
     osgViewer::Viewer viewer;    
     viewer.setUpViewInWindow( 0, 0, WindowWidth, WindowHeight );    
     
+    osg::ref_ptr< osg::GraphicsContext > gc = viewer.getCamera()->getGraphicsContext();    
+    osg::ref_ptr< osg::State > state = new osg::State;
+    state->setCheckForGLErrors( osg::State::ONCE_PER_FRAME );
+    gc->setState( state );
+    
     osg::ref_ptr< osgGA::TrackballManipulator > manipulator = new osgGA::TrackballManipulator();
     viewer.setCameraManipulator( manipulator );
-        
-    osg::ref_ptr< osg::Group > root = new osg::Group;
-    
-    osg::ref_ptr< osg::PositionAttitudeTransform > terrainTransform = new osg::PositionAttitudeTransform();  
+            
+    //osg::ref_ptr< osg::PositionAttitudeTransform > terrainTransform = new osg::PositionAttitudeTransform();  
     
     osg::ref_ptr< WaterSurfaceNode > waterSurfaceNode = new WaterSurfaceNode( GridRadialSize, GridAngularSize );
-    
-    //osgUtil::SmoothingVisitor smoothingVisitor;
-    
+        
     // Link
-    //waterSurfaceNode->accept( smoothingVisitor );    
-    terrainTransform->addChild( waterSurfaceNode );
-    root->addChild( terrainTransform );    
-    viewer.setSceneData( root.get() ); 
+    //terrainTransform->addChild( waterSurfaceNode );
+    //root->addChild( terrainTransform );    
+    viewer.setSceneData( waterSurfaceNode ); 
     
     // Render
     viewer.realize();
