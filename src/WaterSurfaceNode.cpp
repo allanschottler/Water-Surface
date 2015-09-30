@@ -16,6 +16,9 @@ WaterSurfaceNode::WaterSurfaceNode( unsigned int polarGridRadialSize,
     osg::ref_ptr< PolarGridGeometry > polarGridGeometry = new PolarGridGeometry( polarGridRadialSize, polarGridAngularSize );
     polarGridGeometry->linkShader();
     
+    osg::BoundingBox bb( osg::Vec3( -100.0f, -100.0f, -100.0f ), osg::Vec3( 100.0f, 100.0f, 100.0f ) );
+    polarGridGeometry->setInitialBound( bb );
+    
     _geode = new osg::Geode();    
     _geode->addDrawable( polarGridGeometry );
     _geode->getOrCreateStateSet()->setMode( GL_LIGHTING, osg::StateAttribute::OFF );

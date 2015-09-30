@@ -24,7 +24,7 @@ PolarGridGeometry::PolarGridGeometry( unsigned int radialSize, unsigned int angu
     setUseDisplayList( false );
     setUseVertexBufferObjects( true );
     
-    buildGeometry(); 
+    buildGeometry();     
 }
 
 
@@ -54,7 +54,8 @@ Coordinate PolarGridGeometry::makePolarCoordinate( const ICoordinate& ipolar )
 
 unsigned int PolarGridGeometry::getIndex( const ICoordinate& ipolar )
 {
-    unsigned int iRadius = ipolar.first  >= _radialSize  ? ipolar.first - _radialSize   : ipolar.first;
+    unsigned int iRadius = ipolar.first  > _radialSize  ? _radialSize   : ipolar.first;
+    //unsigned int iRadius = ipolar.first;
     unsigned int iAngle  = ipolar.second >= _angularSize ? ipolar.second - _angularSize : ipolar.second;
     
     return iAngle + iRadius * _angularSize;
@@ -77,7 +78,7 @@ Coordinate PolarGridGeometry::cartesianToTexCoord( const Coordinate& cartesian )
 
 void PolarGridGeometry::buildGeometry()
 {    
-    for( unsigned int iRadius = 0; iRadius < _radialSize; iRadius++ )
+    for( unsigned int iRadius = 0; iRadius <= _radialSize; iRadius++ )
     {
         for( unsigned int iAngle = 0; iAngle < _angularSize; iAngle++ )
         {
@@ -96,15 +97,18 @@ void PolarGridGeometry::buildGeometry()
             // TexCoord array
             _texcoords->push_back( osg::Vec3( t.first, t.second, 0.0f ) );
             
+            if( iRadius == _radialSize )
+                continue;
+            
             // Index array
-            osg::ref_ptr< osg::DrawElementsUInt > triangle1 = new osg::DrawElementsUInt( osg::PrimitiveSet::TRIANGLES, 0 );
+            osg::ref_ptr< osg::DrawElementsUInt > triangle1 = new osg::DrawElementsUInt( osg::PrimitiveSet::LINE_LOOP, 0 );
             triangle1->push_back( getIndex( i1 ) );
             triangle1->push_back( getIndex( i3 ) );
             triangle1->push_back( getIndex( i4 ) );
             
             addPrimitiveSet( triangle1 );
             
-            osg::ref_ptr< osg::DrawElementsUInt > triangle2 = new osg::DrawElementsUInt( osg::PrimitiveSet::TRIANGLES, 0 );
+            osg::ref_ptr< osg::DrawElementsUInt > triangle2 = new osg::DrawElementsUInt( osg::PrimitiveSet::LINE_LOOP, 0 );
             triangle2->push_back( getIndex( i1 ) );
             triangle2->push_back( getIndex( i4 ) );
             triangle2->push_back( getIndex( i2 ) );

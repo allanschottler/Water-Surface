@@ -35,6 +35,8 @@ int WaterSurfaceApplication::run()
     osgViewer::Viewer viewer;    
     viewer.setUpViewInWindow( 0, 0, WindowWidth, WindowHeight );    
     
+    viewer.getCamera()->setClearColor( osg::Vec4( 1.0, 1.0, 1.0, 1.0 ) );
+    
     osg::ref_ptr< osg::GraphicsContext > gc = viewer.getCamera()->getGraphicsContext();    
     osg::ref_ptr< osg::State > state = new osg::State;
     state->setCheckForGLErrors( osg::State::ONCE_PER_FRAME );

@@ -12,6 +12,7 @@
 
 #include <osgDB/ReadFile>
 #include <osg/Image>
+#include <osg/Texture2D>
 
 #include <sys/param.h>
 #include <math.h>
@@ -33,8 +34,7 @@ WaterSurfaceShader::WaterSurfaceShader()
     
     _shaderProgram = OSGShaderFactory::getInstance()->createShaderProgram( _vertexProgram, _fragmentProgram );
     
-    // Vertex textures
-    _noiseTexture = buildNoiseTexture( 4 );    
+    // Vertex textures   
     //_vertexTextures.push_back( noiseTexture );
 }
 
@@ -67,40 +67,83 @@ std::string WaterSurfaceShader::readFile( const char *filePath )
 }
 
 
-osg::ref_ptr< osg::Texture3D > WaterSurfaceShader::buildNoiseTexture( unsigned int pixelSize )
+osg::ref_ptr< osg::Texture2D > build2DTexture( unsigned int pixelSize )
 {
-    /*osg::ref_ptr< osg::Image > image = new osg::Image();    
-    image->allocateImage( pixelSize, pixelSize, pixelSize, GL_RGBA, GL_FLOAT );
-    image->setOrigin(osg::Image::BOTTOM_LEFT); */
+    osg::ref_ptr< osg::Image > image = osgDB::readImageFile( "/home/v/allanws/Desktop/skylightgray.png" );
+    image->scaleImage( pixelSize, pixelSize, 1 );
         
-    /*const long size = pixelSize * pixelSize * pixelSize * 3;
+    osg::ref_ptr< osg::Texture2D > texture = new osg::Texture2D;
+    
+    texture->setFilter( osg::Texture2D::MIN_FILTER, osg::Texture2D::LINEAR );
+    texture->setFilter( osg::Texture2D::MAG_FILTER, osg::Texture2D::LINEAR );
+    
+    texture->setWrap( osg::Texture2D::WRAP_S, osg::Texture2D::MIRROR );
+    texture->setWrap( osg::Texture2D::WRAP_T, osg::Texture2D::MIRROR );   
+    
+    //texture->setDataVariance( osg::Object::DYNAMIC );
+    texture->setImage( image );
+    
+    return texture;
+}
 
-    unsigned char* data = (unsigned char*)calloc( size, sizeof( unsigned char ) ); 
+
+osg::ref_ptr< osg::Texture2D > build2DNoiseTexture( unsigned int pixelSize )
+{
+    osg::ref_ptr< osg::Image > image = new osg::Image;
+    image->allocateImage( pixelSize, pixelSize, 1, GL_RGBA, GL_FLOAT );
+        
+    const long size = pixelSize * pixelSize * 4;
+
+    float* data = reinterpret_cast< float* >( image->data() ); 
    
     srand( static_cast< unsigned >( time( 0 ) ) );
     
-    for( long i = 0; i < size; i+=3 )
+    for( long i = 0; i < size; i+=4 )
     {
         float val = static_cast< float >( rand() ) / static_cast< float >( RAND_MAX );
-        data[ i+0 ] = val*255;
-        data[ i+1 ] = val*255;
-        data[ i+2 ] = val*255;
+        data[ i+0 ] = val;
+        data[ i+1 ] = val;
+        data[ i+2 ] = val;
+        data[ i+3 ] = 1.0f;
+    }
+        
+    osg::ref_ptr< osg::Texture2D > texture = new osg::Texture2D( image );
+    
+    texture->setFilter( osg::Texture2D::MIN_FILTER, osg::Texture2D::LINEAR );
+    texture->setFilter( osg::Texture2D::MAG_FILTER, osg::Texture2D::LINEAR );
+    
+    texture->setWrap( osg::Texture2D::WRAP_S, osg::Texture2D::MIRROR );
+    texture->setWrap( osg::Texture2D::WRAP_T, osg::Texture2D::MIRROR );   
+    
+    //texture->setDataVariance( osg::Object::DYNAMIC );
+    texture->setImage( image );
+    
+    return texture;
+}
+
+
+osg::ref_ptr< osg::Texture3D > WaterSurfaceShader::buildNoiseTexture( unsigned int pixelSize )
+{
+    osg::ref_ptr< osg::Image > image = new osg::Image();    
+    image->allocateImage( pixelSize, pixelSize, pixelSize, GL_RGBA, GL_FLOAT );
+        
+    const long size = pixelSize * pixelSize * pixelSize * 4;
+
+    float* data = reinterpret_cast< float* >( image->data() ); 
+   
+    srand( static_cast< unsigned >( time( 0 ) ) );
+    
+    for( long i = 0; i < size; i+=4 )
+    {
+        float val = static_cast< float >( rand() ) / static_cast< float >( RAND_MAX );
+        data[ i+0 ] = val;
+        data[ i+1 ] = 0.0f;
+        data[ i+2 ] = 0.0f;
+        data[ i+3 ] = 1.0f;
     }
     
-    osg::ref_ptr< osg::Image > image = new osg::Image();    
-    image->setImage( 
-        (int)pixelSize, 
-        (int)pixelSize, 
-        (int)pixelSize, 
-        GL_RGB, 
-        GL_RGB, 
-        GL_UNSIGNED_BYTE, 
-        data, 
-        osg::Image::NO_DELETE 
-    );
     
-    image->setOrigin( osg::Image::BOTTOM_LEFT );*/
-    
+        
     /*for( unsigned int i = 0; i < pixelSize; i++ )
     {
         for( unsigned int j = 0; j < pixelSize; j++ )
@@ -115,16 +158,16 @@ osg::ref_ptr< osg::Texture3D > WaterSurfaceShader::buildNoiseTexture( unsigned i
         }
     }*/
         
-    osg::ref_ptr< osg::Image > image = osgDB::readImageFile( "/home/v/allanws/Desktop/bunny100.png" );
+    /*osg::ref_ptr< osg::Image > image = osgDB::readImageFile( "/home/v/allanws/Desktop/skylightgray.png" );
     image->scaleImage( pixelSize, pixelSize, 1 );
     
     osg::ref_ptr< osg::Image > image3d = new osg::Image;
-    image3d->allocateImage( pixelSize, pixelSize, 2, image->getPixelFormat(), image->getDataType() );
+    image3d->allocateImage( pixelSize, pixelSize, 1, image->getPixelFormat(), image->getDataType() );
     image3d->copySubImage( 0, 0, 0, image );
-    image3d->copySubImage( 0, 0, 1, image );
-    image3d->setInternalTextureFormat( image->getInternalTextureFormat() );
+    //image3d->copySubImage( 0, 0, 1, image );
+    image3d->setInternalTextureFormat( image->getInternalTextureFormat() );*/
     
-    osg::ref_ptr< osg::Texture3D > texture = new osg::Texture3D;
+    osg::ref_ptr< osg::Texture3D > texture = new osg::Texture3D( image );
     
     texture->setFilter( osg::Texture3D::MIN_FILTER, osg::Texture3D::LINEAR );
     texture->setFilter( osg::Texture3D::MAG_FILTER, osg::Texture3D::LINEAR );
@@ -132,9 +175,6 @@ osg::ref_ptr< osg::Texture3D > WaterSurfaceShader::buildNoiseTexture( unsigned i
     texture->setWrap( osg::Texture3D::WRAP_S, osg::Texture3D::MIRROR );
     texture->setWrap( osg::Texture3D::WRAP_T, osg::Texture3D::MIRROR );
     texture->setWrap( osg::Texture3D::WRAP_R, osg::Texture3D::MIRROR );    
-    
-    //texture->setDataVariance( osg::Object::DYNAMIC );
-    texture->setImage( image3d );
     
     return texture;
 }
@@ -167,8 +207,11 @@ void WaterSurfaceShader::linkStateSet( osg::ref_ptr< osg::StateSet > stateSet )
     _timeUniform->set( 0.0f );
     _timeUniform->setUpdateCallback( new TimeUniformCallback() );
     stateSet->addUniform( _timeUniform );
-        
-    stateSet->setTextureAttributeAndModes( 0, _noiseTexture, osg::StateAttribute::ON );
+            
+    //_noiseTexture = buildNoiseTexture( 4 ); 
+    
+    //stateSet->setTextureAttributeAndModes( 0, _noiseTexture, osg::StateAttribute::ON );
+    stateSet->setTextureAttributeAndModes( 0, buildNoiseTexture( 4 ), osg::StateAttribute::ON );
         
     osg::ref_ptr< osg::Uniform > uniform = new osg::Uniform( "vertexTexture0", 0 );
     stateSet->addUniform( uniform ); 
