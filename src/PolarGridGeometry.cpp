@@ -101,14 +101,16 @@ void PolarGridGeometry::buildGeometry()
                 continue;
             
             // Index array
-            osg::ref_ptr< osg::DrawElementsUInt > triangle1 = new osg::DrawElementsUInt( osg::PrimitiveSet::TRIANGLES, 0 );
+            //osg::ref_ptr< osg::DrawElementsUInt > triangle1 = new osg::DrawElementsUInt( osg::PrimitiveSet::TRIANGLES, 0 );
+            osg::ref_ptr< osg::DrawElementsUInt > triangle1 = new osg::DrawElementsUInt( osg::PrimitiveSet::LINE_LOOP, 0 );
             triangle1->push_back( getIndex( i1 ) );
             triangle1->push_back( getIndex( i3 ) );
             triangle1->push_back( getIndex( i4 ) );
             
             addPrimitiveSet( triangle1 );
             
-            osg::ref_ptr< osg::DrawElementsUInt > triangle2 = new osg::DrawElementsUInt( osg::PrimitiveSet::TRIANGLES, 0 );
+            //osg::ref_ptr< osg::DrawElementsUInt > triangle2 = new osg::DrawElementsUInt( osg::PrimitiveSet::TRIANGLES, 0 );
+            osg::ref_ptr< osg::DrawElementsUInt > triangle2 = new osg::DrawElementsUInt( osg::PrimitiveSet::LINE_LOOP, 0 );
             triangle2->push_back( getIndex( i1 ) );
             triangle2->push_back( getIndex( i4 ) );
             triangle2->push_back( getIndex( i2 ) );
