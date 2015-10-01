@@ -21,7 +21,7 @@ public:
     
 private:
     
-    void buildTexture();
+    void buildImage();
     
     
     unsigned int _pixelSize;

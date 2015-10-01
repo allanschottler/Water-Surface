@@ -14,9 +14,8 @@ NoiseTexture3D::NoiseTexture3D( unsigned int pixelSize )
 {
     _pixelSize = pixelSize;
     _image = new osg::Image();
-    _image->allocateImage( pixelSize, pixelSize, pixelSize, GL_LUMINANCE, GL_FLOAT );
         
-    buildTexture();
+    buildImage();
     
     setFilter( osg::Texture3D::MIN_FILTER, osg::Texture3D::LINEAR );
     setFilter( osg::Texture3D::MAG_FILTER, osg::Texture3D::LINEAR );
@@ -25,7 +24,8 @@ NoiseTexture3D::NoiseTexture3D( unsigned int pixelSize )
     setWrap( osg::Texture3D::WRAP_T, osg::Texture3D::MIRROR );
     setWrap( osg::Texture3D::WRAP_R, osg::Texture3D::MIRROR );    
     
-    setDataVariance( osg::Object::DYNAMIC );
+    setBorderWidth( 0 );
+    
     setInternalFormat( GL_LUMINANCE32F_ARB );
 }
 
@@ -35,28 +35,23 @@ NoiseTexture3D::~NoiseTexture3D()
 }
 
 
-float randomFloat()
-{
-    return static_cast< float >( rand() ) / static_cast< float >( RAND_MAX );
-}
+void NoiseTexture3D::buildImage()
+{   
+    _image->allocateImage( _pixelSize, _pixelSize, _pixelSize, GL_RGBA, GL_FLOAT );
+        
+    const long size = _pixelSize * _pixelSize * _pixelSize * 4;
 
-
-void NoiseTexture3D::buildTexture()
-{
+    float* data = reinterpret_cast< float* >( _image->data() ); 
+   
     srand( static_cast< unsigned >( time( 0 ) ) );
     
-    for( unsigned int i = 0; i < _pixelSize; i++ )
+    for( long i = 0; i < size; i+=4 )
     {
-        for( unsigned int j = 0; j < _pixelSize; j++ )
-        {
-            for( unsigned int k = 0; k < _pixelSize; k++ )
-            {
-                float val = randomFloat();
-                _image->data( k, j, i )[ 0 ] = 1.0f;
-                _image->data( k, j, i )[ 1 ] = 0.0f;
-                _image->data( k, j, i )[ 2 ] = 0.0f;
-            }
-        }
+        float val = static_cast< float >( rand() ) / static_cast< float >( RAND_MAX );
+        data[ i+0 ] = val;
+        data[ i+1 ] = 0.0f;
+        data[ i+2 ] = 0.0f;
+        data[ i+3 ] = 1.0f;
     }
     
     setImage( _image );

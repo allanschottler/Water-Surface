@@ -31,8 +31,6 @@ private:
         
     static std::string readFile( const char *filePath );
     
-    osg::ref_ptr< osg::Texture3D > buildNoiseTexture( unsigned int pixelSize );
-    
     
     std::string _vertexProgram;
 
@@ -41,10 +39,6 @@ private:
     osg::ref_ptr< osg::Program > _shaderProgram;
 
     osg::ref_ptr< osg::Uniform > _timeUniform;
-    
-    osg::ref_ptr< osg::Texture3D > _noiseTexture;
-    
-    std::vector< osg::ref_ptr< osg::Texture3D > > _vertexTextures;
      
 };
 
