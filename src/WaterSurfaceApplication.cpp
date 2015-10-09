@@ -44,14 +44,9 @@ int WaterSurfaceApplication::run()
     
     osg::ref_ptr< osgGA::TrackballManipulator > manipulator = new osgGA::TrackballManipulator();
     viewer.setCameraManipulator( manipulator );
-            
-    //osg::ref_ptr< osg::PositionAttitudeTransform > terrainTransform = new osg::PositionAttitudeTransform();  
-    
+                
     osg::ref_ptr< WaterSurfaceNode > waterSurfaceNode = new WaterSurfaceNode( GridRadialSize, GridAngularSize );
-        
-    // Link
-    //terrainTransform->addChild( waterSurfaceNode );
-    //root->addChild( terrainTransform );    
+          
     viewer.setSceneData( waterSurfaceNode ); 
     
     // Render

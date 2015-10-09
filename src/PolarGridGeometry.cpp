@@ -32,13 +32,6 @@ PolarGridGeometry::~PolarGridGeometry()
 {
 }
 
-
-void PolarGridGeometry::linkShader()
-{
-    _shader.linkStateSet( getOrCreateStateSet() );
-}
-
-
 ICoordinate PolarGridGeometry::makePolarIndex( unsigned int iRadius, unsigned int iAngle )
 {
     return std::make_pair( iRadius, iAngle );

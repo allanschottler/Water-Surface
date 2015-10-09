@@ -11,8 +11,6 @@
 #include <osg/StateSet>
 #include <osg/Program>
 #include <osg/Uniform>
-#include <osg/NodeVisitor>
-#include <osg/Texture3D>
 
 
 class WaterSurfaceShader
@@ -24,8 +22,6 @@ public:
     virtual ~WaterSurfaceShader();    
     
     void linkStateSet( osg::ref_ptr<osg::StateSet> stateSet );    
-
-    void loadVariables();
     
 private:    
         

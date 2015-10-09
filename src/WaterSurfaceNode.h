@@ -13,6 +13,11 @@
 #include <osg/Texture3D>
 #include <vector>
 
+#include "WaterSurfaceShader.h"
+#include "OceanFloorShader.h"
+
+
+class PolarGridGeometry;
 
 class WaterSurfaceNode : public osg::Group
 {
@@ -27,7 +32,15 @@ protected:
         
 private:
                
-    osg::ref_ptr< osg::Geode > _geode;        
+    osg::ref_ptr< osg::Geode > _geode;   
+    
+    osg::ref_ptr< PolarGridGeometry > _waterSurfaceGeometry;
+    
+    osg::ref_ptr< PolarGridGeometry > _oceanFloorGeometry;    
+    
+    WaterSurfaceShader _waterSurfaceShader;
+    
+    OceanFloorShader _oceanFloorShader;
 
 };
 

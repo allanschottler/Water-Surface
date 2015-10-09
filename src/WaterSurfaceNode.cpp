@@ -9,19 +9,33 @@
 #include "WaterSurfaceNode.h"
 #include "PolarGridGeometry.h"
 
+#include <osg/BlendFunc>
 
 WaterSurfaceNode::WaterSurfaceNode( unsigned int polarGridRadialSize, 
                                     unsigned int polarGridAngularSize )
-{    
-    osg::ref_ptr< PolarGridGeometry > polarGridGeometry = new PolarGridGeometry( polarGridRadialSize, polarGridAngularSize );
-    polarGridGeometry->linkShader();
+{        
+    const osg::BoundingBox bb( osg::Vec3( -100.0f, -100.0f, -100.0f ), osg::Vec3( 100.0f, 100.0f, 100.0f ) );
     
-    osg::BoundingBox bb( osg::Vec3( -100.0f, -100.0f, -100.0f ), osg::Vec3( 100.0f, 100.0f, 100.0f ) );
-    polarGridGeometry->setInitialBound( bb );
+    _waterSurfaceGeometry = new PolarGridGeometry( polarGridRadialSize, polarGridAngularSize );
+    _waterSurfaceGeometry->setInitialBound( bb );
+    _waterSurfaceShader.linkStateSet( _waterSurfaceGeometry->getOrCreateStateSet() );  
+    
+    _waterSurfaceGeometry->getOrCreateStateSet()->setRenderBinDetails( 1, "transparent" );
+    _waterSurfaceGeometry->getOrCreateStateSet()->setRenderingHint( osg::StateSet::TRANSPARENT_BIN );
+    
+    _oceanFloorGeometry = new PolarGridGeometry( polarGridRadialSize, polarGridAngularSize );
+    _oceanFloorGeometry->setInitialBound( bb );
+    _oceanFloorShader.linkStateSet( _oceanFloorGeometry->getOrCreateStateSet() );
+    
+    osg::ref_ptr< osg::BlendFunc > bf = new osg::BlendFunc;
+    bf->setFunction( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     
     _geode = new osg::Geode();    
-    _geode->addDrawable( polarGridGeometry );
+    _geode->addDrawable( _waterSurfaceGeometry );
+    _geode->addDrawable( _oceanFloorGeometry );
     _geode->getOrCreateStateSet()->setMode( GL_LIGHTING, osg::StateAttribute::OFF );
+    _geode->getOrCreateStateSet()->setMode( GL_BLEND, osg::StateAttribute::ON );
+    _geode->getOrCreateStateSet()->setAttributeAndModes( bf ); 
         
     addChild( _geode );
 }

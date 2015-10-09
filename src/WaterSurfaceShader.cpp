@@ -12,8 +12,6 @@
 #include "NoiseTexture3D.h"
 
 #include <osgDB/ReadFile>
-#include <osg/Image>
-#include <osg/Texture2D>
 
 #include <sys/param.h>
 #include <math.h>
@@ -30,8 +28,8 @@ const std::string TimeLocation = "time";
 
 WaterSurfaceShader::WaterSurfaceShader() 
 { 
-    _vertexProgram   = readFile( "shader/vertexdisplacement.vs" );
-    _fragmentProgram = readFile( "shader/vertexdisplacement.fs" );
+    _vertexProgram   = readFile( "shader/watersurface.vs" );
+    _fragmentProgram = readFile( "shader/watersurface.fs" );
     
     _shaderProgram = OSGShaderFactory::getInstance()->createShaderProgram( _vertexProgram, _fragmentProgram );    
 }
@@ -69,6 +67,7 @@ void WaterSurfaceShader::linkStateSet( osg::ref_ptr< osg::StateSet > stateSet )
 {           
     std::stringstream ss;
              
+    // Vertex Textures
     for( unsigned int iLevel = 0; iLevel < NumHeightMapLevels; iLevel++ )
     {
         int level = (int)iLevel;
@@ -90,18 +89,8 @@ void WaterSurfaceShader::linkStateSet( osg::ref_ptr< osg::StateSet > stateSet )
     _timeUniform->set( 0.0f );
     _timeUniform->setUpdateCallback( new TimeUniformCallback() );
     stateSet->addUniform( _timeUniform );
-            
-    /*stateSet->setTextureAttributeAndModes( 0, new NoiseTexture3D( 32 ), osg::StateAttribute::ON );
-        
-    osg::ref_ptr< osg::Uniform > uniform = new osg::Uniform( "vertexTexture0", 0 );
-    stateSet->addUniform( uniform ); */
         
     // Link
     stateSet->setAttributeAndModes( _shaderProgram, osg::StateAttribute::ON );    
-}
-
-
-void WaterSurfaceShader::loadVariables()
-{
 }
 
